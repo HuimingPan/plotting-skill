@@ -1,5 +1,7 @@
 # SciPlot Pin — 科研数据图风格挑选画廊 (Matplotlib)
 
+🌐 **在线直接访问（GitHub Pages）**：**<https://huimingpan.github.io/plotting-skill/>**
+
 一个采用 **Pinterest 瀑布流排版** 的交互式科研数据图风格挑选工具，专注于**定量科研数据可视化（Data Plots，而非概念插图/示意图）**。所有图表风格均遵循顶刊排版规范（单上侧误差棒、纯星号显著性标注、空心穿线符号、去上右边框 / IEEE 四框内刻度等），并提供完整可运行的原生 **`matplotlib`** 复现代码与命令行批量导出脚本。
 
 ---
