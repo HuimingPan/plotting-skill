@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SciPlot Pin — 科研数据图风格挑选画廊 (Matplotlib)</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <link rel="stylesheet" href="css/styles.css?v=20261120_6">
+</head>
+<body>
+  <!-- Pinterest-Style Sticky Top Header -->
+  <header class="top-header">
+    <div class="header-inner">
+      <a class="brand" href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
+        <div class="brand-mark">M</div>
+        <div class="brand-text">
+          <span class="brand-title">SciPlot Pin</span>
+          <span class="brand-sub">科研数据图风格挑选 · Matplotlib</span>
+        </div>
+      </a>
+
+      <nav class="nav-mode-group" aria-label="浏览视图">
+        <button class="nav-mode-btn active" data-mode="all">探索全部</button>
+        <button class="nav-mode-btn" data-mode="pinned">
+          <span>已收藏</span>
+          <span class="pin-count-badge" id="pinCountBadge">0</span>
+        </button>
+      </nav>
+
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="搜索图表 ID、类型、期刊风范、标签或 Matplotlib 接口（如：bar-nature-jitter、云雨图、雷达图、Nature）..."
+          autocomplete="off"
+        >
+        <span class="search-kbd" id="searchKbd">/</span>
+        <button class="search-clear" id="searchClear" title="清空搜索">×</button>
+      </div>
+
+      <div class="header-actions">
+        <div class="density-switch" title="切换瀑布流列宽密度">
+          <button class="density-btn" data-cols="3">3列大图</button>
+          <button class="density-btn active" data-cols="4">4列标准</button>
+          <button class="density-btn" data-cols="5">5列总览</button>
+        </div>
+        <button class="export-btn" id="copySelectedIdsBtn" title="一键复制已收藏（或当前筛选）的全部图表 ID">
+          <span>⧉ 复制已选 ID</span>
+        </button>
+        <button class="export-btn" id="exportPackBtn" title="导出已收藏（或当前筛选）的绘图风格与 Matplotlib 代码清单">
+          <span>⬇ 导出风格包</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Control Deck: 1. Chart Categories | 2. Palette Switcher | 3. Multi-Tag Filter -->
+  <section class="control-deck">
+    <div class="deck-inner">
+      <!-- 1. Categories -->
+      <div class="category-bar" id="categoryBar" role="tablist" aria-label="数据图表类别"></div>
+
+      <!-- 4. Palette Selector -->
+      <div class="palette-bar-wrap">
+        <div class="palette-bar-row">
+          <span class="section-label">🎨 Palette 实时科研配色：</span>
+          <div class="palette-scroll" id="paletteScroll"></div>
+          <button class="palette-copy-hex-btn" id="copyPaletteHexBtn" title="复制当前调色盘 Python 列表">复制色盘 HEX</button>
+        </div>
+        <div class="custom-palette-editor" id="customPaletteEditor"></div>
+      </div>
+
+      <!-- 2. Tag Filter Rail -->
+      <div class="tag-filter-row">
+        <span class="section-label">🏷️ 风格与自定义标签：</span>
+        <div class="tag-chips-scroll" id="quickTagChips"></div>
+        <button class="toggle-all-tags-btn" id="toggleAllTagsBtn">展开全部标签维度 ▼</button>
+        <button class="clear-filters-btn" id="clearFiltersBtn" style="display:none;">清空筛选 ×</button>
+      </div>
+
+      <div class="tag-taxonomy-drawer" id="tagTaxonomyDrawer"></div>
+    </div>
+  </section>
+
+  <!-- 3. Pinterest Masonry Gallery Wall -->
+  <main class="gallery-main">
+    <div class="status-strip">
+      <div id="statusStripText">加载科研数据绘图中...</div>
+      <div>点击任意卡片查看高清大图、在线打标签、复制 <code>matplotlib</code> 完整复现代码</div>
+    </div>
+
+    <div class="masonry-wall" id="masonryWall"></div>
+
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <div style="font-size:36px;">📉</div>
+      <h3>未找到匹配当前筛选条件的数据图风格</h3>
+      <p>尝试切换其他图表大类、取消部分组合标签，或清空搜索关键词。</p>
+      <button class="pin-save-btn" id="resetEmptyFiltersBtn">重置全部筛选</button>
+    </div>
+  </main>
+
+  <!-- Pinterest Closeup Detail Modal -->
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true">
+    <div class="detail-modal">
+      <button class="modal-close-btn" id="modalCloseBtn" aria-label="关闭">×</button>
+
+      <div class="modal-left">
+        <div class="modal-figure-card" id="modalFigureCard"></div>
+
+        <div class="modal-left-controls">
+          <div>
+            <div class="section-label" style="margin-bottom:6px;">🎨 快速切换 Palette 预览效果：</div>
+            <div class="modal-mini-palettes" id="modalMiniPalettes"></div>
+          </div>
+
+          <div class="modal-download-bar">
+            <div class="bg-toggle-group">
+              <button class="bg-toggle-btn active" data-bg="white">纯白纸刊底</button>
+              <button class="bg-toggle-btn" data-bg="warm">幻灯暖灰底</button>
+              <button class="bg-toggle-btn" data-bg="transparent">透明网格</button>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button class="dl-btn" id="dlSvgBtn">下载 .SVG</button>
+              <button class="dl-btn" id="dlPngBtn">下载高清 .PNG</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-right" id="modalRightContent"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/palettes.js?v=20261120_6"></script>
+  <script src="js/mpl-svg-engine.js?v=20261120_6"></script>
+  <script src="js/catalog.js?v=20261120_6"></script>
+  <script src="js/app.js?v=20261120_6"></script>
+</body>
+</html>

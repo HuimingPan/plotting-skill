@@ -1,0 +1,16 @@
+# Python & Virtual Environments
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Generated Plot Outputs & Local Scratch Scripts
+outputs/
+plot_success_rate.py
+task_success_rate.*
+
+# macOS & Editor
+.DS_Store
+.vscode/
+.idea/
